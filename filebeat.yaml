@@ -1,0 +1,9 @@
+filebeat.inputs: 
+- type: log
+  paths:
+    - /tmp/jnvd.json
+  #json.message_key:
+  #  - "CVE_Items"
+output.elasticsearch:
+    hosts: ["127.0.0.1:9200"] 
+
