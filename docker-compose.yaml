@@ -2,47 +2,57 @@
 version: '2'
 services:
   elasticsearch:
-   image: docker.elastic.co/elasticsearch/elasticsearch:6.5.0
-   network_mode: "host"      
    container_name: elasticsearch
+   image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
    environment:
      - cluster.name=docker-cluster
      - bootstrap.memory_lock=true
      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - network.host=0.0.0.0
+     - discovery.zen.minimum_master_nodes=1
+     - discovery.type=single-node
    ulimits:
      memlock:
        soft: -1
        hard: -1
+   networks:
+     - elk
    volumes:
      - esdata:/usr/share/elasticsearch/data
    ports:
      - 9200:9200
 
   kibana:
-   image: docker.elastic.co/kibana/kibana:6.5.0
-   network_mode: "host"      
-   environment:
-     SERVER_HOST: "127.0.0.1"
-     ELASTICSEARCH_URL: http://127.0.0.1
-   depends_on: 
-     - elasticsearch
-
-  #logstash:
-  # image: docker.elastic.co/logstash/logstash:6.5.0
-  # network_mode: "host"      
-  # volumes:
-  #   - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
-
-  filebeat:
-   image: docker.elastic.co/beats/filebeat:6.5.0
-   network_mode: "host"
+   container_name: kibana
+   image: docker.elastic.co/kibana/kibana:6.5.1
    volumes:
-     - ./filebeat.yaml:/usr/share/filebeat/filebeat.yml
-     - ./jnvd.json:/tmp/jnvd.json
-   depends_on: 
-     - elasticsearch
-     - kibana
+     - ./kibana.yml:/usr/share/kibana/config/kibana.yml 
+   networks:
+     - elk
+   ports:
+     - 5601:5601
 
+  logstash:
+   container_name: logstash
+   image: docker.elastic.co/logstash/logstash:6.5.1
+   networks:
+     - elk
+   volumes:
+     - ./pipeline:/usr/share/logstash/pipeline:ro
+     - ./split_files:/tmp/cve
+
+  #filebeat:
+  # container_name: filebeat
+  # image: docker.elastic.co/beats/filebeat:6.5.1
+  # volumes:
+  #   - ./filebeat.yaml:/usr/share/filebeat/filebeat.yml
+  #   - ./jnvd.json:/tmp/jnvd.json
+  # networks:
+  #   - elk
+
+networks:
+  elk:
+    driver: bridge 
 volumes:
   esdata:
    driver: local

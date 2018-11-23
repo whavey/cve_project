@@ -3,19 +3,23 @@
 import csv
 import json
 
-def enum_json_object(key,base,value):
+def enum_json_object(key,base,val):
   print("{}:".format(key))
   for count in range(len(base)):
-    print("\t{}".format(base[count][value]))
+    print("\t{}".format(base[count][val]))
    
 nvd_file = r'./jnvd.json'
 with open(nvd_file) as nvd_json:
   nvd = json.load(nvd_json)
   for item in nvd["CVE_Items"]:
-    if item["cve"]["affects"]["vendor"]["vendor_data"]:
-      print("CVE ID: {}\n".format(item["cve"]["CVE_data_meta"]["ID"]))
-      enum_json_object("Affects",item["cve"]["affects"]["vendor"]["vendor_data"],"vendor_name") 
-      enum_json_object("Problem",item["cve"]["problemtype"]["problemtype_data"],"value")
-      enum_json_object("References",item["cve"]["references"]["reference_data"],"url")
-    print("="*30)
+  #  if item["cve"]["affects"]["vendor"]["vendor_data"]:
+  #    print("CVE ID: {}\n".format(item["cve"]["CVE_data_meta"]["ID"]))
+  #    enum_json_object("Affects",item["cve"]["affects"]["vendor"]["vendor_data"],"vendor_name") 
+  #    #enum_json_object("Problem",item["cve"]["problemtype"]["problemtype_data"],"value")
+  #    enum_json_object("References",item["cve"]["references"]["reference_data"],"url")
+  #  print("="*30)
+    name = item["cve"]["CVE_data_meta"]["ID"]+".json"
+    file = open('./split_files/{}'.format(name), 'w')
+    file.write(str(item["cve"]))
+    file.close()
 
