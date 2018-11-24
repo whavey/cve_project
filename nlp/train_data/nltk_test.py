@@ -7,18 +7,18 @@ import os
 
 tokens = []
 
-def ie_preprocess(document):
+def ie_preprocess(document,cve):
   sentences = sent_tokenize(document)
   sentences = [word_tokenize(sent) for sent in sentences]
   sentences = [nltk.pos_tag(sent) for sent in sentences]
   for sen in sentences:
     for i in sen:
-      print(i) 
+      print(i,file=open("{}.iob".format(cve),"a+")) 
 
 for cve in os.listdir():
   if "CVE" in cve:
     print("\nClassifying: {}\n{}".format(cve,"="*40))
-    ie_preprocess(open(cve).read())
+    ie_preprocess(open(cve).read(),cve)
     tokens += [t.replace("\n","") for t in open(cve)]
 
 def clean_tokens():
