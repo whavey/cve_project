@@ -1,0 +1,6 @@
+---
+version: '2'
+services:
+  debian:
+    container_name: centos
+    image: centos:latest
