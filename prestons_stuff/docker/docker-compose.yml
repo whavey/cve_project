@@ -1,6 +1,20 @@
 ---
 version: '2'
+
 services:
-  debian:
+
+  centos:
     container_name: centos
     image: centos:latest
+    networks:
+      - testbed
+
+  kali:
+    container_name: kali
+    image: kalilinux/kali-linux-docker
+    networks:
+      - testbed
+
+networks:
+  testbed:
+    driver: bridge
